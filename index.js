@@ -1,33 +1,39 @@
-const fs = require('fs');
 const sgMail = require('@sendgrid/mail');
-const template = require('es6-template-strings');
 
 // constants
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-const email = fs.readFileSync('email-template/dist/achievement.html', 'utf8');
+
+const renderEmail = (requestBody) => {
+    return JSON.stringify(requestBody, null, 2);
+}
+
+const response = (code, jsonBody) => {
+    return {
+        statusCode: code,
+        body: JSON.stringify(jsonBody)
+    }
+}
 
 // lambda function call
 exports.handler = async function(event) {
-    const webhookData = JSON.parse(event.body);
 
-    /**
-     * here you would lookup the subject's full name and
-     * email address in your user/auth provider database
-     * to personalize the email
-     */
-    // const { subject } = webhookData.earnedAchievement;
-    // const userInfo = await getUserInfo(subject);
+    if(event.httpMethod === "POST") {
+        const msg = {
+            to: 'stephanie@cosycuppies.com.au',
+            from: 'api@cosycuppies.com.au',
+            subject: 'Cart submitted',
+            html: renderEmail(JSON.parse(event.body))
+        };
 
-    const msg = {
-        to: 'test@example.com', // user's email here
-        from: 'test@example.com', // your company's email here
-        subject: 'Achievement Earned!',
-        html: template(email, webhookData.achievement)
-    };
-    await sgMail.send(msg);
+        try {
+            await sgMail.send(msg);
+            return response(200, {success: true, status: "Sent successfully"});
+        }
+        catch (err) {
+            return response(500, {success: false, status: "Failed to submit cart", extra: err});
+        }
 
-    return {
-        statusCode: 200,
-        body: 'OK'
-    };
+    }
+
+    return response(405, {success: false, status: "Failed to submit cart", extra: `Method ${event.httpMethod} not supported`});
 };
