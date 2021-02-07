@@ -118,4 +118,35 @@ describe("Lambda tests", () => {
         expect(msgs.length).to.eq(0);
 
     })
+
+    it("Can accept a JSON object", async () => {
+
+        const mock = new MockMail();
+
+        mockSgMail(mock);
+
+        const event = {
+            enquiry: {
+                email: "test@example.com",
+                cart: [
+                    {
+                        "cuppie": 5
+                    },
+                    {
+                        "duppie": 1
+                    }
+                ]
+            }
+        }
+
+        const resp = await handler(event)
+
+        console.info({resp})
+
+        expect(resp.statusCode).to.eq(200);
+
+        const msgs = mock.messages;
+        expect(msgs.length).to.eq(2);
+
+    })
 })

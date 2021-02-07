@@ -5,6 +5,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const FromAddress = 'no-reply@cosycuppies.com.au';
 const ToCosyAddress = process.env.COSY_CUPPIES_ADDR;
+let globalEvent;
 
 exports.mockSgMail = (mock) => {
     sgMail = mock;
@@ -23,14 +24,19 @@ const renderEnquirerReply = (enquiry) => {
 }
 
 const response = (code, jsonBody) => {
+    if(code !== 200) {
+        console.error({globalEvent})
+    }
     return {
         statusCode: code,
-        body: JSON.stringify(jsonBody)
+        body: jsonBody
     }
 }
 
 // lambda function call
 exports.handler = async function(event) {
+    
+    globalEvent = event;
 
     if(!(event.httpMethod === undefined || event.httpMethod === "POST")) {
         return response(405, {success: false, status: "Unexpected method", extra: event.httpMethod})
@@ -38,10 +44,16 @@ exports.handler = async function(event) {
 
     let parsed = null;
     try {
-        parsed = JSON.parse(event.body);
+        if(typeof event.body === "string") {
+            parsed = JSON.parse(event.body);
+        } else if(typeof event.enquiry === "object") {
+            parsed = event;
+        } else {
+            throw new Error("Unable to decode request");
+        }
     }
     catch(err) {
-        return response(400, {success: false, status: "Unable to parse request into JSON", extra: err})
+        return response(400, {success: false, status: "Unable to parse request into JSON", extra: err.message})
     }
 
     if(parsed && parsed.enquiry && typeof(parsed.enquiry.email) === "string") {
