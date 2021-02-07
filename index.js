@@ -3,7 +3,7 @@ let sgMail = require('@sendgrid/mail');
 // constants
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const FromAddress = 'no-reply@cosycuppies.com.au';
+const FromAddress = 'Cosy Cuppies <no-reply@cosycuppies.com.au>';
 const ToCosyAddress = process.env.COSY_CUPPIES_ADDR;
 let globalEvent;
 
