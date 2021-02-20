@@ -1,4 +1,5 @@
 let sgMail = require('@sendgrid/mail');
+const fs = require('fs');
 
 // constants
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -15,12 +16,16 @@ const renderEmail = (enquiry) => {
     return JSON.stringify(enquiry, null, 2);
 }
 
-const renderEnquirerReply = (enquiry) => {
-    return JSON.stringify({
-        header: "Thankyou for your cart enquiry",
-        title: "Your cart enquiry has been submitted",
-        misc: "We will be in contact to confirm your order."
-    }, null, 2)
+const renderEnquirerReply = async (enquiry) => {
+    return new Promise((resolve, reject) => {
+        fs.readFile("./thankyou.html", "utf8", (err, data) => {
+            if(err) {
+                reject(err)
+            } else {
+                resolve(data)
+            }
+        });
+    })
 }
 
 const response = (code, jsonBody) => {
@@ -71,7 +76,7 @@ exports.handler = async function(event) {
             to: enquirer,
             from: FromAddress,
             subject: `Cart enquiry for Cosy Cuppies`,
-            html: renderEnquirerReply(parsed.enquiry)
+            html: await renderEnquirerReply(parsed.enquiry)
         }
 
         try {

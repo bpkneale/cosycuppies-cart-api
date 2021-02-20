@@ -8,4 +8,4 @@ config.json
 
 # we build this for deployment
 # it should not be checked in
-lambda.zip
+*.zip

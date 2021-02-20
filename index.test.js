@@ -147,6 +147,8 @@ describe("Lambda tests", () => {
 
         const msgs = mock.messages;
         expect(msgs.length).to.eq(2);
+        expect(msgs[0].html).to.contain("<html>")
+        expect(msgs[0].html).to.contain("Cosy Cuppies, The Vines, Western Australia")
 
     })
 })
