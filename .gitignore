@@ -9,3 +9,4 @@ config.json
 # we build this for deployment
 # it should not be checked in
 *.zip
+testoutput.html

@@ -1,0 +1,39 @@
+{
+    "enquiry": {
+        "email": "ben@example.com",
+        "requiredBy": "2021-02-21T07:30:47.740+08:00",
+        "delivery": true,
+        "deliveryAddress": "1234 fake street, perth",
+        "cart": [{
+            "cupcake": {
+                "id": "bouquet",
+                "amount": 12,
+                "cupcakeFlavour": {
+                    "flavour": "Vanilla",
+                    "id": "vanilla"
+                },
+                "frostingFlavour": {
+                    "flavour": "Almond",
+                    "id": "almond"
+                },
+                "box": false,
+                "extraInformation": ""
+            }
+        }, {
+            "cupcake": {
+                "id": "enchanted-forest",
+                "amount": 48,
+                "cupcakeFlavour": {
+                    "flavour": "Red velvet",
+                    "id": "red-velvet"
+                },
+                "frostingFlavour": {
+                    "flavour": "Bubble gum",
+                    "id": "bubble-gum"
+                },
+                "box": true,
+                "extraInformation": "i want the butterflies"
+            }
+        }]
+    }
+}

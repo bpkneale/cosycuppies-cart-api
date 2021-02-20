@@ -1,5 +1,6 @@
 const { mockSgMail, handler } = require("./index");
 const { expect } = require("chai");
+const fs = require('fs');
 
 class MockMail {
     constructor(throwError) {
@@ -14,6 +15,46 @@ class MockMail {
         } else {
             return Promise.resolve(true);
         }
+    }
+}
+
+const testPayload = {
+    "enquiry": {
+        "email": "ben@example.com",
+        "requiredBy": "2021-02-21T07:30:47.740+08:00",
+        "delivery": true,
+        "deliveryAddress": "1234 fake street, perth",
+        "cart": [{
+            "cupcake": {
+                "id": "bouquet",
+                "amount": 12,
+                "cupcakeFlavour": {
+                    "flavour": "Vanilla",
+                    "id": "vanilla"
+                },
+                "frostingFlavour": {
+                    "flavour": "Almond",
+                    "id": "almond"
+                },
+                "box": false,
+                "extraInformation": ""
+            }
+        }, {
+            "cupcake": {
+                "id": "enchanted-forest",
+                "amount": 48,
+                "cupcakeFlavour": {
+                    "flavour": "Red velvet",
+                    "id": "red-velvet"
+                },
+                "frostingFlavour": {
+                    "flavour": "Bubble gum",
+                    "id": "bubble-gum"
+                },
+                "box": true,
+                "extraInformation": "i want the butterflies"
+            }
+        }]
     }
 }
 
@@ -125,19 +166,7 @@ describe("Lambda tests", () => {
 
         mockSgMail(mock);
 
-        const event = {
-            enquiry: {
-                email: "test@example.com",
-                cart: [
-                    {
-                        "cuppie": 5
-                    },
-                    {
-                        "duppie": 1
-                    }
-                ]
-            }
-        }
+        const event = {...testPayload}
 
         const resp = await handler(event)
 
@@ -149,6 +178,9 @@ describe("Lambda tests", () => {
         expect(msgs.length).to.eq(2);
         expect(msgs[0].html).to.contain("<html>")
         expect(msgs[0].html).to.contain("Cosy Cuppies, The Vines, Western Australia")
+        expect(msgs[1].html).to.contain("<html>")
+
+        fs.writeFileSync("./testoutput.html", msgs[1].html);
 
     })
 })

@@ -12,8 +12,39 @@ exports.mockSgMail = (mock) => {
     sgMail = mock;
 }
 
+const renderObjectIntoHtml = (obj) => {
+    let body = "\n<ul>"
+    for (const [key, value] of Object.entries(obj)) {
+        if(typeof value !== "object") {
+            body += `\n<li><b>${key}</b>: ${value}</li>`
+        }
+    }
+    for (const [key, value] of Object.entries(obj)) {
+        if(typeof value === "object") {
+            body += `\n<li><b>${key}</b>:`
+            body += renderObjectIntoHtml(value)
+        }
+    }
+    body += "\n</ul>"
+    return body;
+}
+
 const renderEmail = (enquiry) => {
-    return JSON.stringify(enquiry, null, 2);
+    let body = `<!doctype html>
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Cart submitted from ${enquiry.email}</title>
+      </head>
+      <body>
+      <h3>Website enquiry:</h3>
+      `
+    body += renderObjectIntoHtml(enquiry);
+    body += `</br><h3>Raw enquiry:</h3>`
+    body += `<pre>${JSON.stringify(enquiry, null, 2)}</pre>`
+    body += "</body></html>"
+    return body;
 }
 
 const renderEnquirerReply = async (enquiry) => {
